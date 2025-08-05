@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            padding: 50px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 25px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 700;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.2rem;
+            font-weight: 300;
+        }
+
+        .download-card {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .download-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .download-card:hover::before {
+            left: 100%;
+        }
+
+        .download-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: #ff6b6b;
+            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.3);
+        }
+
+        .app-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+            transition: transform 0.3s ease;
+        }
+
+        .download-card:hover .app-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .app-desc {
+            color: #666;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .download-btn:hover::before {
+            left: 100%;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .download-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .download-btn.downloading {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .status-message {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 15px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-message::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+            z-index: -1;
+        }
+
+        .status-message.show {
+            opacity: 1;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-success {
+            color: #2e7d32;
+            border: 2px solid #4CAF50;
+        }
+
+        .status-info {
+            color: #ff6b6b;
+            border: 2px solid #ff6b6b;
+        }
+
+        .floating-elements {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.1;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .logo {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <div class="floating-element" style="top: 10%; left: 10%; animation-delay: 0s;">🌟</div>
+        <div class="floating-element" style="top: 20%; right: 15%; animation-delay: 1s;">✨</div>
+        <div class="floating-element" style="bottom: 30%; left: 20%; animation-delay: 2s;">💫</div>
+        <div class="floating-element" style="bottom: 20%; right: 10%; animation-delay: 3s;">⭐</div>
+    </div>
+
+    <div class="container">
+        <div class="logo">📥</div>
+        <h1>Download App</h1>
+        <p class="subtitle">Direct download for your application</p>
+
+        <div class="download-card">
+            <div class="app-icon">🎮</div>
+            <div class="app-title">Ultimate App</div>
+            <div class="app-desc">Python application with gaming features and controls</div>
+            <button class="download-btn" onclick="downloadApp()">Download App</button>
+        </div>
+
+        <div class="status-message" id="statusMessage"></div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusEl = document.getElementById('statusMessage');
+            statusEl.textContent = message;
+            statusEl.className = `status-message show status-${type}`;
+        }
+
+        function downloadApp() {
+            const button = event.target;
+            button.classList.add('downloading');
+            button.textContent = 'Downloading...';
+            
+            // Create a working modern Python app with functional anti-recoil
+            const appContent = `import tkinter as tk
+from tkinter import ttk, messagebox
+import threading
+import time
+import ctypes
+from ctypes import wintypes
+import json
+import os
+import math
+
+class ModernApp:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Modern Ultimate App")
+        self.root.geometry("600x800")
+        self.root.configure(bg='#1a1a1a')
+        self.root.resizable(False, False)
+        
+        # Center the window
+        self.center_window()
+        
+        # Variables
+        self.anti_recoil_enabled = tk.BooleanVar()
+        self.aim_assist_enabled = tk.BooleanVar()
+        self.master_switch = tk.BooleanVar()
+        self.is_running = False
+        
+        # Anti-recoil settings
+        self.recoil_strength = tk.DoubleVar(value=5.0)  # Much stronger default
+        self.recoil_delay = tk.DoubleVar(value=0.02)  # Much faster default
+        self.recoil_pattern = tk.StringVar(value="vertical")
+        
+        # Aim assist settings
+        self.aim_sensitivity = tk.DoubleVar(value=1.5)
+        self.aim_smoothness = tk.DoubleVar(value=0.8)
+        
+        # Mouse detection for anti-recoil
+        self.last_mouse_x = 0
+        self.last_mouse_y = 0
+        self.mouse_pressed = False
+        self.anti_recoil_active = False
+        
+        # Load settings
+        self.load_settings()
+        
+        # Enable anti-recoil by default if not set
+        if not self.anti_recoil_enabled.get():
+            self.anti_recoil_enabled.set(True)
+            
+        self.setup_ui()
+        
+    def center_window(self):
+        self.root.update_idletasks()
+        width = self.root.winfo_width()
+        height = self.root.winfo_height()
+        x = (self.root.winfo_screenwidth() // 2) - (width // 2)
+        y = (self.root.winfo_screenheight() // 2) - (height // 2)
+        self.root.geometry(f'{width}x{height}+{x}+{y}')
+        
+    def load_settings(self):
+        try:
+            if os.path.exists('app_settings.json'):
+                with open('app_settings.json', 'r') as f:
+                    settings = json.load(f)
+                    self.anti_recoil_enabled.set(settings.get('anti_recoil', True))  # Default to True
+                    self.aim_assist_enabled.set(settings.get('aim_assist', False))
+                    self.recoil_strength.set(settings.get('recoil_strength', 5.0))  # Much stronger default
+                    self.recoil_delay.set(settings.get('recoil_delay', 0.02))  # Much faster default
+                    self.recoil_pattern.set(settings.get('recoil_pattern', 'vertical'))
+                    self.aim_sensitivity.set(settings.get('aim_sensitivity', 1.5))
+                    self.aim_smoothness.set(settings.get('aim_smoothness', 0.8))
+        except:
+            pass
+            
+    def save_settings(self):
+        settings = {
+            'anti_recoil': self.anti_recoil_enabled.get(),
+            'aim_assist': self.aim_assist_enabled.get(),
+            'recoil_strength': self.recoil_strength.get(),
+            'recoil_delay': self.recoil_delay.get(),
+            'recoil_pattern': self.recoil_pattern.get(),
+            'aim_sensitivity': self.aim_sensitivity.get(),
+            'aim_smoothness': self.aim_smoothness.get()
+        }
+        try:
+            with open('app_settings.json', 'w') as f:
+                json.dump(settings, f)
+            messagebox.showinfo("Settings Saved", "Your settings have been saved!")
+        except:
+            messagebox.showerror("Error", "Failed to save settings!")
+        
+    def setup_ui(self):
+        # Main container with scrollbar
+        canvas = tk.Canvas(self.root, bg='#1a1a1a', highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg='#1a1a1a')
+        
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+        
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # Title with modern styling
+        title_frame = tk.Frame(scrollable_frame, bg='#1a1a1a')
+        title_frame.pack(fill='x', pady=(20, 30))
+        
+        title = tk.Label(title_frame, text="🎮 MODERN ULTIMATE APP", 
+                        font=("Segoe UI", 24, "bold"), 
+                        bg='#1a1a1a', fg='#00ff88')
+        title.pack()
+        
+        subtitle = tk.Label(title_frame, text="Advanced Gaming Control System", 
+                           font=("Segoe UI", 12), 
+                           bg='#1a1a1a', fg='#888888')
+        subtitle.pack(pady=(5, 0))
+        
+        # Master Switch Section
+        master_frame = tk.Frame(scrollable_frame, bg='#2d2d2d', relief='flat', bd=0)
+        master_frame.pack(fill='x', pady=(0, 20), padx=20)
+        
+        master_header = tk.Label(master_frame, text="🔧 MASTER CONTROL", 
+                               font=("Segoe UI", 14, "bold"), 
+                               bg='#2d2d2d', fg='#ffffff')
+        master_header.pack(pady=(15, 10))
+        
+        master_switch_frame = tk.Frame(master_frame, bg='#2d2d2d')
+        master_switch_frame.pack(pady=(0, 15))
+        
+        master_switch = tk.Checkbutton(master_switch_frame, variable=self.master_switch,
+                                     text="Enable Master Switch (CAPS LOCK)", 
+                                     font=("Segoe UI", 11),
+                                     bg='#2d2d2d', fg='#ffffff', selectcolor='#1a1a1a',
+                                     activebackground='#2d2d2d', activeforeground='#00ff88')
+        master_switch.pack()
+        
+        # Anti-Recoil Settings Section
+        recoil_frame = tk.Frame(scrollable_frame, bg='#2d2d2d', relief='flat', bd=0)
+        recoil_frame.pack(fill='x', pady=(0, 20), padx=20)
+        
+        recoil_header = tk.Label(recoil_frame, text="🎯 ANTI-RECOIL SETTINGS", 
+                               font=("Segoe UI", 14, "bold"), 
+                               bg='#2d2d2d', fg='#ffffff')
+        recoil_header.pack(pady=(15, 15))
+        
+        # Anti-recoil enable
+        recoil_enable_frame = tk.Frame(recoil_frame, bg='#3d3d3d', relief='flat', bd=0)
+        recoil_enable_frame.pack(fill='x', pady=(0, 10), padx=10)
+        
+        recoil_enable = tk.Checkbutton(recoil_enable_frame, variable=self.anti_recoil_enabled,
+                                      text="Enable Anti-Recoil", 
+                                      font=("Segoe UI", 12, "bold"),
+                                      bg='#3d3d3d', fg='#00ff88', selectcolor='#1a1a1a',
+                                      activebackground='#3d3d3d', activeforeground='#00ff88')
+        recoil_enable.pack(pady=10)
+        
+        # Recoil strength slider
+        strength_frame = tk.Frame(recoil_frame, bg='#3d3d3d', relief='flat', bd=0)
+        strength_frame.pack(fill='x', pady=(0, 10), padx=10)
+        
+        strength_label = tk.Label(strength_frame, text="Recoil Strength:", 
+                                font=("Segoe UI", 10), 
+                                bg='#3d3d3d', fg='#ffffff')
+        strength_label.pack(pady=(10, 5))
+        
+        strength_slider = tk.Scale(strength_frame, from_=0.1, to=10.0, 
+                                 variable=self.recoil_strength, 
+                                 orient='horizontal', resolution=0.1,
+                                 bg='#3d3d3d', fg='#ffffff', 
+                                 highlightthickness=0, troughcolor='#555555',
+                                 activebackground='#00ff88')
+        strength_slider.pack(fill='x', padx=10, pady=(0, 10))
+        
+        # Recoil delay slider
+        delay_frame = tk.Frame(recoil_frame, bg='#3d3d3d', relief='flat', bd=0)
+        delay_frame.pack(fill='x', pady=(0, 10), padx=10)
+        
+        delay_label = tk.Label(delay_frame, text="Recoil Delay (seconds):", 
+                             font=("Segoe UI", 10), 
+                             bg='#3d3d3d', fg='#ffffff')
+        delay_label.pack(pady=(10, 5))
+        
+        delay_slider = tk.Scale(delay_frame, from_=0.01, to=1.0, 
+                              variable=self.recoil_delay, 
+                              orient='horizontal', resolution=0.01,
+                              bg='#3d3d3d', fg='#ffffff', 
+                              highlightthickness=0, troughcolor='#555555',
+                              activebackground='#00ff88')
+        delay_slider.pack(fill='x', padx=10, pady=(0, 10))
+        
+        # Recoil pattern selection
+        pattern_frame = tk.Frame(recoil_frame, bg='#3d3d3d', relief='flat', bd=0)
+        pattern_frame.pack(fill='x', pady=(0, 10), padx=10)
+        
+        pattern_label = tk.Label(pattern_frame, text="Recoil Pattern:", 
+                               font=("Segoe UI", 10), 
+                               bg='#3d3d3d', fg='#ffffff')
+        pattern_label.pack(pady=(10, 5))
+        
+        pattern_combo = ttk.Combobox(pattern_frame, textvariable=self.recoil_pattern,
+                                   values=["vertical", "horizontal", "circular", "random"],
+                                   state="readonly", font=("Segoe UI", 10))
+        pattern_combo.pack(fill='x', padx=10, pady=(0, 10))
+        
+        # Aim Assist Settings Section
+        aim_frame = tk.Frame(scrollable_frame, bg='#2d2d2d', relief='flat', bd=0)
+        aim_frame.pack(fill='x', pady=(0, 20), padx=20)
+        
+        aim_header = tk.Label(aim_frame, text="🎯 AIM ASSIST SETTINGS", 
+                            font=("Segoe UI", 14, "bold"), 
+                            bg='#2d2d2d', fg='#ffffff')
+        aim_header.pack(pady=(15, 15))
+        
+        # Aim assist enable
+        aim_enable_frame = tk.Frame(aim_frame, bg='#3d3d3d', relief='flat', bd=0)
+        aim_enable_frame.pack(fill='x', pady=(0, 10), padx=10)
+        
+        aim_enable = tk.Checkbutton(aim_enable_frame, variable=self.aim_assist_enabled,
+                                  text="Enable Aim Assist", 
+                                  font=("Segoe UI", 12, "bold"),
+                                  bg='#3d3d3d', fg='#00ff88', selectcolor='#1a1a1a',
+                                  activebackground='#3d3d3d', activeforeground='#00ff88')
+        aim_enable.pack(pady=10)
+        
+        # Aim sensitivity slider
+        sensitivity_frame = tk.Frame(aim_frame, bg='#3d3d3d', relief='flat', bd=0)
+        sensitivity_frame.pack(fill='x', pady=(0, 10), padx=10)
+        
+        sensitivity_label = tk.Label(sensitivity_frame, text="Aim Sensitivity:", 
+                                  font=("Segoe UI", 10), 
+                                  bg='#3d3d3d', fg='#ffffff')
+        sensitivity_label.pack(pady=(10, 5))
+        
+        sensitivity_slider = tk.Scale(sensitivity_frame, from_=0.1, to=5.0, 
+                                    variable=self.aim_sensitivity, 
+                                    orient='horizontal', resolution=0.1,
+                                    bg='#3d3d3d', fg='#ffffff', 
+                                    highlightthickness=0, troughcolor='#555555',
+                                    activebackground='#00ff88')
+        sensitivity_slider.pack(fill='x', padx=10, pady=(0, 10))
+        
+        # Aim smoothness slider
+        smoothness_frame = tk.Frame(aim_frame, bg='#3d3d3d', relief='flat', bd=0)
+        smoothness_frame.pack(fill='x', pady=(0, 10), padx=10)
+        
+        smoothness_label = tk.Label(smoothness_frame, text="Aim Smoothness:", 
+                                  font=("Segoe UI", 10), 
+                                  bg='#3d3d3d', fg='#ffffff')
+        smoothness_label.pack(pady=(10, 5))
+        
+        smoothness_slider = tk.Scale(smoothness_frame, from_=0.1, to=1.0, 
+                                   variable=self.aim_smoothness, 
+                                   orient='horizontal', resolution=0.1,
+                                   bg='#3d3d3d', fg='#ffffff', 
+                                   highlightthickness=0, troughcolor='#555555',
+                                   activebackground='#00ff88')
+        smoothness_slider.pack(fill='x', padx=10, pady=(0, 10))
+        
+        # Status Section
+        status_frame = tk.Frame(scrollable_frame, bg='#2d2d2d', relief='flat', bd=0)
+        status_frame.pack(fill='x', pady=(0, 20), padx=20)
+        
+        status_header = tk.Label(status_frame, text="📊 STATUS", 
+                               font=("Segoe UI", 14, "bold"), 
+                               bg='#2d2d2d', fg='#ffffff')
+        status_header.pack(pady=(15, 10))
+        
+        self.status_label = tk.Label(status_frame, text="🟢 Ready", 
+                                   font=("Segoe UI", 12, "bold"), 
+                                   bg='#2d2d2d', fg='#00ff88')
+        self.status_label.pack(pady=(0, 15))
+        
+        # Control Buttons
+        buttons_frame = tk.Frame(scrollable_frame, bg='#1a1a1a')
+        buttons_frame.pack(fill='x', pady=(0, 20), padx=20)
+        
+        # Start Button
+        self.start_btn = tk.Button(buttons_frame, text="🚀 START APPLICATION", 
+                                 command=self.toggle_app, 
+                                 font=("Segoe UI", 12, "bold"),
+                                 bg='#00ff88', fg='#1a1a1a', 
+                                 relief='flat', bd=0,
+                                 activebackground='#00cc6a', activeforeground='#1a1a1a',
+                                 cursor='hand2', height=2)
+        self.start_btn.pack(fill='x', pady=(0, 10))
+        
+        # Settings Button
+        settings_btn = tk.Button(buttons_frame, text="⚙️ SAVE SETTINGS", 
+                               command=self.save_settings, 
+                               font=("Segoe UI", 10),
+                               bg='#444444', fg='#ffffff', 
+                               relief='flat', bd=0,
+                               activebackground='#555555', activeforeground='#ffffff',
+                               cursor='hand2', height=1)
+        settings_btn.pack(fill='x')
+        
+        # Info Section
+        info_frame = tk.Frame(scrollable_frame, bg='#2d2d2d', relief='flat', bd=0)
+        info_frame.pack(fill='x', padx=20)
+        
+        info_text = """ℹ️ INSTRUCTIONS:
+• Adjust recoil strength and delay to your preference
+• Choose recoil pattern (vertical, horizontal, circular, random)
+• Set aim sensitivity and smoothness
+• Enable features you want to use
+• Press CAPS LOCK to activate master switch
+• Click START to begin monitoring
+• Settings are automatically saved"""
+        
+        info_label = tk.Label(info_frame, text=info_text, 
+                            font=("Segoe UI", 9), 
+                            bg='#2d2d2d', fg='#888888',
+                            justify='left', anchor='w')
+        info_label.pack(pady=15, padx=15)
+        
+    def toggle_app(self):
+        if not self.is_running:
+            self.start_app()
+        else:
+            self.stop_app()
+            
+    def start_app(self):
+        self.is_running = True
+        self.status_label.config(text="🔴 Running", fg='#ff4444')
+        self.start_btn.config(text="⏹️ STOP APPLICATION", bg='#ff4444', activebackground='#cc3333')
+        
+        # Start monitoring thread
+        self.monitor_thread = threading.Thread(target=self.monitor_keys, daemon=True)
+        self.monitor_thread.start()
+        
+        messagebox.showinfo("App Started", "Application is now running!\\nPress CAPS LOCK to activate features.")
+        
+    def stop_app(self):
+        self.is_running = False
+        self.status_label.config(text="🟢 Ready", fg='#00ff88')
+        self.start_btn.config(text="🚀 START APPLICATION", bg='#00ff88', activebackground='#00cc6a')
+        
+        messagebox.showinfo("App Stopped", "Application has been stopped.")
+        
+    def monitor_keys(self):
+        while self.is_running:
+            try:
+                # Check CAPS LOCK state
+                caps_state = ctypes.windll.user32.GetKeyState(0x14)
+                self.master_switch.set(caps_state & 0x0001)
+                
+                # Check for mouse button press (left click)
+                left_button_state = ctypes.windll.user32.GetKeyState(0x01)  # VK_LBUTTON
+                self.mouse_pressed = (left_button_state & 0x8000) != 0
+                
+                # Get current mouse position
+                cursor = ctypes.wintypes.POINT()
+                ctypes.windll.user32.GetCursorPos(ctypes.byref(cursor))
+                
+                # Check if mouse moved
+                mouse_moved = (cursor.x != self.last_mouse_x or cursor.y != self.last_mouse_y)
+                self.last_mouse_x = cursor.x
+                self.last_mouse_y = cursor.y
+                
+                if self.master_switch.get():
+                    if self.anti_recoil_enabled.get() and self.mouse_pressed:
+                        # Anti-recoil is active when mouse is pressed
+                        self.anti_recoil_active = True
+                        self.anti_recoil()
+                    else:
+                        self.anti_recoil_active = False
+                        
+                    if self.aim_assist_enabled.get() and mouse_moved:
+                        self.aim_assist()
+                
+                time.sleep(0.01)  # Faster polling for better responsiveness
+            except:
+                break
+    
+    def anti_recoil(self):
+        try:
+            # Get current mouse position
+            cursor = ctypes.wintypes.POINT()
+            ctypes.windll.user32.GetCursorPos(ctypes.byref(cursor))
+            
+            # Calculate recoil compensation based on pattern
+            strength = self.recoil_strength.get()
+            pattern = self.recoil_pattern.get()
+            
+            # Get screen dimensions for boundary checking
+            screen_width = ctypes.windll.user32.GetSystemMetrics(0)
+            screen_height = ctypes.windll.user32.GetSystemMetrics(1)
+            
+            # Make movement more aggressive and noticeable
+            movement_multiplier = 8  # Much stronger movement
+            
+            if pattern == "vertical":
+                # Move mouse down to compensate upward recoil (more aggressive)
+                new_y = cursor.y + int(strength * movement_multiplier)
+                # Ensure cursor stays within screen bounds
+                new_y = max(0, min(new_y, screen_height))
+                ctypes.windll.user32.SetCursorPos(cursor.x, new_y)
+                
+            elif pattern == "horizontal":
+                # Move mouse left/right to compensate horizontal recoil
+                direction = 1 if cursor.x % 2 == 0 else -1
+                new_x = cursor.x + int(strength * direction * movement_multiplier)
+                # Ensure cursor stays within screen bounds
+                new_x = max(0, min(new_x, screen_width))
+                ctypes.windll.user32.SetCursorPos(new_x, cursor.y)
+                
+            elif pattern == "circular":
+                # Circular recoil pattern (more aggressive)
+                angle = time.time() * 4  # Faster rotation
+                offset_x = int(strength * math.cos(angle) * movement_multiplier)
+                offset_y = int(strength * math.sin(angle) * movement_multiplier)
+                new_x = cursor.x + offset_x
+                new_y = cursor.y + offset_y
+                # Ensure cursor stays within screen bounds
+                new_x = max(0, min(new_x, screen_width))
+                new_y = max(0, min(new_y, screen_height))
+                ctypes.windll.user32.SetCursorPos(new_x, new_y)
+                
+            elif pattern == "random":
+                # Random recoil pattern (more aggressive)
+                import random
+                offset_x = random.randint(-int(strength * movement_multiplier), int(strength * movement_multiplier))
+                offset_y = random.randint(-int(strength * movement_multiplier), int(strength * movement_multiplier))
+                new_x = cursor.x + offset_x
+                new_y = cursor.y + offset_y
+                # Ensure cursor stays within screen bounds
+                new_x = max(0, min(new_x, screen_width))
+                new_y = max(0, min(new_y, screen_height))
+                ctypes.windll.user32.SetCursorPos(new_x, new_y)
+            
+            # Shorter delay for more responsive recoil compensation
+            time.sleep(max(0.01, self.recoil_delay.get() * 0.3))
+            
+        except Exception as e:
+            print(f"Anti-recoil error: {e}")
+        
+    def aim_assist(self):
+        try:
+            # Get current mouse position
+            cursor = ctypes.wintypes.POINT()
+            ctypes.windll.user32.GetCursorPos(ctypes.byref(cursor))
+            
+            # Simulate aim assistance with sensitivity and smoothness
+            sensitivity = self.aim_sensitivity.get()
+            smoothness = self.aim_smoothness.get()
+            
+            # Get screen dimensions for boundary checking
+            screen_width = ctypes.windll.user32.GetSystemMetrics(0)
+            screen_height = ctypes.windll.user32.GetSystemMetrics(1)
+            
+            # Calculate smooth movement
+            target_x = cursor.x + int(sensitivity * 2)
+            target_y = cursor.y + int(sensitivity * 2)
+            
+            # Apply smoothness
+            new_x = int(cursor.x + (target_x - cursor.x) * smoothness)
+            new_y = int(cursor.y + (target_y - cursor.y) * smoothness)
+            
+            # Ensure cursor stays within screen bounds
+            new_x = max(0, min(new_x, screen_width))
+            new_y = max(0, min(new_y, screen_height))
+            
+            # Move cursor smoothly
+            ctypes.windll.user32.SetCursorPos(new_x, new_y)
+            
+        except Exception as e:
+            print(f"Aim assist error: {e}")
+    
+    def run(self):
+        # Bind window close event
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.root.mainloop()
+        
+    def on_closing(self):
+        if self.is_running:
+            self.stop_app()
+        self.save_settings()
+        self.root.destroy()
+
+if __name__ == "__main__":
+    try:
+        app = ModernApp()
+        app.run()
+    except Exception as e:
+        messagebox.showerror("Error", f"Failed to start application: {str(e)}")
+`;
+            
+            try {
+                const blob = new Blob([appContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'modern_ultimate_app.py';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showStatus('Working app with customizable anti-recoil downloaded!', 'success');
+                
+            } catch (error) {
+                showStatus('Error downloading app', 'error');
+            }
+            
+            setTimeout(() => {
+                button.classList.remove('downloading');
+                button.textContent = 'Download Complete!';
+                
+                setTimeout(() => {
+                    button.textContent = 'Download App';
+                    showStatus('', 'info');
+                    document.getElementById('statusMessage').classList.remove('show');
+                }, 2000);
+            }, 1000);
+        }
+
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click effects to card
+            const card = document.querySelector('.download-card');
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+
+            // Add floating animation to logo
+            const logo = document.querySelector('.logo');
+            logo.addEventListener('mouseenter', function() {
+                this.style.animation = 'bounce 0.5s ease';
+            });
+            
+            logo.addEventListener('animationend', function() {
+                this.style.animation = 'bounce 2s infinite';
+            });
+        });
+    </script>
+</body>
+</html> 
