@@ -21,34 +21,34 @@ wheels/
 *.egg
 MANIFEST
 
+# PyInstaller
+*.manifest
+*.spec
+
 # Virtual environments
 venv/
 env/
 ENV/
-env.bak/
-venv.bak/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
 # OS
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Application specific
-app_settings.json
+# Temporary files
+*.tmp
+*.temp
 *.log
-temp/
-cache/
 
-# Downloaded files
-modern_ultimate_app.py 
+# Build artifacts
+build/
+dist/
+*.spec
+
+# Keep the executable for distribution
+!dist/UltimateGamingApp.exe 
